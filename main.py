@@ -1,3 +1,13 @@
+'''
+1. convert : convert to byte
+2. padding : compute byte length and padding
+3. select cipher: AES DES SEED ~~
+4. select operation mode : ~~
+5. key_gen
+(6.) IV
+7. encryption
+8. decryption
+'''
 from Crypto.Cipher import AES
 from PIL import Image
 import binascii, os, random, struct
