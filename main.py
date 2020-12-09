@@ -8,6 +8,11 @@ block_size = 16
 def xor(a, b):
     return bytes(x ^ y for x, y in zip(a, b))
 
+def CTRIV(iv):
+    integer = int.from_bytes(iv, byteorder='big', signed=False)
+    integer += 1
+    return integer.to_bytes(block_size, byteorder='big', signed=False)
+
 def encryptBlock(cipher, key, block):
     if cipher == "AES":
         encryptor = AES.new(key, AES.MODE_ECB)
@@ -51,7 +56,7 @@ def encryptBytes(cipher, mode, key, iv, bytes):
             iv = nextiv
         elif mode == "CTR":
             encryptedBytes += xor(encryptBlock(cipher, key, iv), currentBlock)
-            iv = xor(iv, (1).to_bytes(block_size, byteorder="big", signed=True))
+            iv = CTRIV(iv)
 
     return encryptedBytes
 
@@ -77,7 +82,7 @@ def decryptBytes(cipher, mode, key, iv, bytes):
             iv = currentBlock
         elif mode == "CTR":
             decryptedBytes += xor(encryptBlock(cipher, key, iv), currentBlock)
-            iv = xor(iv, (1).to_bytes(block_size, byteorder="big", signed=True))
+            iv = CTRIV(iv)
     # decoding
     lastBlock = decryptedBytes[(block_num - 1) * block_size:]
     lastBlockReverse = lastBlock[::-1]
@@ -158,5 +163,6 @@ inputFileName = filedialog.askopenfilename()
 encryptedFileName = inputFileName + ".enc"
 decryptedFileName = encryptedFileName + ".dec"
 
-encryptFile("AES", "CBC", key, IV, inputFileName, encryptedFileName)
-decryptFile("AES", "CBC", key, IV, encryptedFileName, decryptedFileName)
+fileEncryptionMode = "CBC"
+encryptFile("AES", fileEncryptionMode, key, IV, inputFileName, encryptedFileName)
+decryptFile("AES", fileEncryptionMode, key, IV, encryptedFileName, decryptedFileName)
